@@ -6,6 +6,7 @@ import { PromptTemplate } from 'langchain/prompts';
 import { BufferMemory, ChatMessageHistory } from 'langchain/memory';
 import { AIChatMessage, HumanChatMessage } from 'langchain/schema';
 import { supabase } from './supabase-client.js';
+import { OPENAI_API_KEY } from './config.js';
 
 const CONDENSE_PROMPT =
   PromptTemplate.fromTemplate(`Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
@@ -41,13 +42,13 @@ export const chatCompletion = async (req, res) => {
 
   const chat = new ChatOpenAI({
     modelName: 'gpt-3.5-turbo',
-    openAIApiKey: process.env.OPENAI_API_KEY,
+    openAIApiKey: OPENAI_API_KEY,
     temperature: 0,
   });
 
   const vectorStore = await SupabaseVectorStore.fromExistingIndex(
     new OpenAIEmbeddings({
-      openAIApiKey: process.env.OPENAI_API_KEY,
+      openAIApiKey: OPENAI_API_KEY,
     }),
     {
       client: supabase,
