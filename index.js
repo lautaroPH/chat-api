@@ -16,6 +16,7 @@ const corsOptions = {
     }
   },
   optionsSuccessStatus: 200,
+  methods: 'POST',
 };
 
 app.use(cors(corsOptions));
