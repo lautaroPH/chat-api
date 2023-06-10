@@ -5,8 +5,16 @@ import cors from 'cors';
 const app = express();
 const port = 4000;
 
+const whitelist = ['http://localhost:3000', 'https://www.chenkster.xyz'];
+
 const corsOptions = {
-  origin: ['http://localhost:3000', 'https://www.chenkster.xyz'],
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   optionsSuccessStatus: 200,
 };
 
