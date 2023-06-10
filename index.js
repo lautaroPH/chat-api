@@ -5,7 +5,11 @@ import cors from 'cors';
 const app = express();
 
 const corsOptions = {
-  origin: ['http://localhost:3000', 'https://chenkster.xyz'],
+  origin: [
+    'http://localhost:3000',
+    'https://chenkster.xyz',
+    'https://chenkster-test.vercel.app',
+  ],
   optionsSuccessStatus: 200,
 };
 
