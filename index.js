@@ -5,7 +5,12 @@ import cors from 'cors';
 const app = express();
 const port = 4000;
 
-app.use(cors());
+const corsOptions = {
+  origin: ['http://localhost:3000', 'https://www.chenkster.xyz'],
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json()); // Agrega esta línea
 app.post('/', chatCompletion);
 
