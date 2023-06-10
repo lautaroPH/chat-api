@@ -6,7 +6,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json()); // Agrega esta línea
-app.use('/', (req, res, next) => {
+app.get('/', (req, res, next) => {
   res.status(200).json({ message: 'Hello world' });
 });
 app.post('/', chatCompletion);
