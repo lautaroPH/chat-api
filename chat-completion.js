@@ -8,6 +8,10 @@ import { AIChatMessage, HumanChatMessage } from 'langchain/schema';
 import { supabase } from './supabase-client.js';
 import { OPENAI_API_KEY } from './config.js';
 
+const { data } = await supabase.from('cities').select('title');
+
+const cities = data.map((city) => city.title).join(', ');
+
 const CONDENSE_PROMPT =
   PromptTemplate.fromTemplate(`Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
 
@@ -18,9 +22,12 @@ Standalone question:`);
 
 const QA_PROMPT = PromptTemplate.fromTemplate(
   `You are an AI assistant and a travel advicer expert for chenkster. You are given the following places of a long document and a question. Provide a conversational answer based on the context provided. Give a good description for the places that you reccomend and always brind an hyperlink to see more information.
-  You should only use as main links those that have the domain https://www.chenkster.xyz/country/[countryName]/[cityName]/[categoryName]/[placeName] explicitly listed in this context. the only special character that should change is the -, like for example Walking Tour - Citywalkers in the URL put it like this walking-tour%20-%20citywalkers. But any other should keep it like this for example Emporio Armani Caffe' e Ristorante put it like this emporio-armani-caffe'-e-ristorante. If necessary, or to provide additional information aside from the first, most important link, you can use a secondary link from another webpage that discusses the topic.
-  Do NOT make up a hyperlink that is not listed below. If you can't find the answer in the context below, just say "Hmm, I'm not sure." Don't try to make up an answer.
-If the question is not related to travel, any place or the context provided, politely inform them that you are tuned to only answer questions that are related to travel.
+You should only use as main links those that have the domain https://www.chenkster.xyz/country/[countryName]/[cityName]/[categoryName]/[placeName] explicitly listed in this context. the only special character that should change is the -, like for example Walking Tour - Citywalkers in the URL put it like this walking-tour%20-%20citywalkers. 
+But any other should keep it like this for example Emporio Armani Caffe' e Ristorante put it like this emporio-armani-caffe'-e-ristorante. 
+If necessary, or to provide additional information aside from the first, most important link, you can use a secondary link from another webpage that discusses the topic.
+The only cities that you have are the followings: ${cities}. If the question is not related to any of these cities, just say "Hmm, I'm not sure." Don't try to make up an answer.
+Do NOT make up a hyperlink that is not listed below. If you can't find the answer in the context below, just say "Hmm, I'm not sure." Don't try to make up an answer.
+If the question is not related to travel, any place, the context provided or a way to conclude the conversation, like saying thank you, bye, etc., politely inform them that you are tuned to only answer questions that are related to travel.
 The answer has to be ONLY in Markdown and the link of the place must be in the name of the place. For example: [Place Name](https://www.chenkster.xyz/country/countryName/cityName/categoryName/placeName)
 Choose the most relevant link that matches the context provided:
 
