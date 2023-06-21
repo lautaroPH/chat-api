@@ -7,7 +7,8 @@ const app = express();
 const corsOptions = {
   origin: [
     'http://localhost:3000',
-    'https://chenkster.xyz',
+    'https://www.chenkster.xyz',
+    'https://chenkster-prototype-42dg.vercel.app',
     'https://chenkster-test.vercel.app',
   ],
   optionsSuccessStatus: 200,
