@@ -7,7 +7,7 @@ import { BufferMemory, ChatMessageHistory } from 'langchain/memory';
 import { AIChatMessage, HumanChatMessage } from 'langchain/schema';
 import { supabase } from './supabase-client.js';
 import { OPENAI_API_KEY } from './config.js';
-import { StreamingTextResponse, LangChainStream, Message } from 'ai';
+import { StreamingTextResponse, LangChainStream } from 'ai';
 
 const { data } = await supabase.from('cities').select('title');
 
