@@ -14,7 +14,7 @@ const app = express();
 //   optionsSuccessStatus: 200,
 // };
 
-app.use(cors());
+app.use(cors('*'));
 app.use(express.json()); // Agrega esta línea
 app.get('/', (req, res, next) => {
   res.status(200).json({ message: 'Hello world' });
