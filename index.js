@@ -4,17 +4,17 @@ import { PORT } from './config.js';
 import cors from 'cors';
 const app = express();
 
-const corsOptions = {
-  origin: [
-    'http://localhost:3000/',
-    'https://www.chenkster.xyz',
-    'https://chenkster-prototype-42dg.vercel.app',
-    'https://chenkster-test.vercel.app',
-  ],
-  optionsSuccessStatus: 200,
-};
+// const corsOptions = {
+//   origin: [
+//     'http://localhost:3000/',
+//     'https://www.chenkster.xyz',
+//     'https://chenkster-prototype-42dg.vercel.app',
+//     'https://chenkster-test.vercel.app',
+//   ],
+//   optionsSuccessStatus: 200,
+// };
 
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json()); // Agrega esta línea
 app.get('/', (req, res, next) => {
   res.status(200).json({ message: 'Hello world' });
