@@ -7,6 +7,7 @@ import { BufferMemory, ChatMessageHistory } from 'langchain/memory';
 import { AIChatMessage, HumanChatMessage } from 'langchain/schema';
 import { supabase } from './supabase-client.js';
 import { OPENAI_API_KEY } from './config.js';
+import { StreamingTextResponse, LangChainStream, Message } from 'ai';
 
 const { data } = await supabase.from('cities').select('title');
 
@@ -45,10 +46,15 @@ export const chatCompletion = async (req, res) => {
 
   const sanitizedQuestion = question.trim().replaceAll('\n', ' ');
 
+  const { stream, handlers } = LangChainStream();
+
   const chat = new ChatOpenAI({
     modelName: 'gpt-3.5-turbo',
     openAIApiKey: OPENAI_API_KEY,
     temperature: 0,
+    frequencyPenalty: 0.5,
+    streaming: true,
+    callbackManager: CallbackManager.fromHandlers(handlers),
   });
 
   const vectorStore = await SupabaseVectorStore.fromExistingIndex(
@@ -91,7 +97,8 @@ export const chatCompletion = async (req, res) => {
       chat_history: history ? new ChatMessageHistory(pastMessages) : [],
     });
 
-    res.status(200).json(response);
+    return new StreamingTextResponse(stream);
+    // res.status(200).json(response);
   } catch (error) {
     console.log('error', error);
     res.status(500).json({ message: 'Something went wrong' });
