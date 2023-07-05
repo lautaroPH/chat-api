@@ -2,6 +2,7 @@ import express from 'express';
 import { chatCompletion } from './chat-completion.js';
 import { PORT } from './config.js';
 import cors from 'cors';
+import { oldChatCompletion } from './old-chat-completion.js';
 const app = express();
 
 const corsOptions = {
@@ -20,6 +21,7 @@ app.get('/', (req, res, next) => {
   res.status(200).json({ message: 'Hello world' });
 });
 app.post('/', chatCompletion);
+app.post('/old-chat', oldChatCompletion);
 
 app.listen(PORT, () => {
   console.log(`Servidor Express iniciado en http://localhost:${PORT}`);
