@@ -1,7 +1,7 @@
 import { openai } from './openai.js';
 import { supabase } from './supabase-client.js';
 
-const { data } = await supabase
+const { data, error } = await supabase
   .from('all_data')
   .select('itineraries')
   .eq('city_id', '42f44596-316d-4c4f-b7f3-130cc6d68b67')
@@ -42,7 +42,7 @@ export const oldChatCompletion = async (req, res) => {
     });
 
     res.status(200).json({
-      answer: completion.data.choices[0].message,
+      answer: completion.data.choices[0].message.content,
       tokenks: completion.data.usage.prompt_tokens,
     });
   } catch (error) {
