@@ -1,17 +1,31 @@
 import { openai } from './openai.js';
 import { supabase } from './supabase-client.js';
 
-const { data, error } = await supabase
-  .from('all_data')
-  .select('itineraries')
-  .eq('city_id', '42f44596-316d-4c4f-b7f3-130cc6d68b67')
-  .single();
-
 export const oldChatCompletion = async (req, res) => {
-  const { messages, userId } = req.body;
+  const { messages, userId, city } = req.body;
 
   if (messages.length === 0) {
     return res.status(400).json({ message: 'No question in the request' });
+  }
+
+  const { data: cityData } = await supabase
+    .from('cities')
+    .select('id')
+    .ilike('title', city)
+    .single();
+
+  if (!cityData) {
+    return res.status(400).json({ message: 'City not found' });
+  }
+
+  const { data, error } = await supabase
+    .from('all_data')
+    .select('itineraries')
+    .eq('city_id', cityData.id)
+    .single();
+
+  if (error || !data) {
+    return res.status(500).json({ message: 'Something went wrong' });
   }
 
   const messagesWithPrompt = [
