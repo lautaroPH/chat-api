@@ -4,6 +4,7 @@ import { PORT } from './config.js';
 import cors from 'cors';
 import { oldChatCompletion } from './old-chat-completion.js';
 import { generateDescription } from './generate-description.js';
+import { streamingChat } from './streaming-chat.js';
 const app = express();
 
 const corsOptions = {
@@ -24,6 +25,7 @@ app.get('/', (req, res, next) => {
 app.post('/', chatCompletion);
 app.post('/old-chat', oldChatCompletion);
 app.post('/generate-description', generateDescription);
+app.post('/chat-streaming', streamingChat);
 
 app.listen(PORT, () => {
   console.log(`Servidor Express iniciado en http://localhost:${PORT}`);
