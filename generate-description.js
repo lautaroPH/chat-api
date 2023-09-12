@@ -1,10 +1,15 @@
-import { openai } from './openai.js';
+import { OPENAI_API_KEY } from './config.js';
+import { createParser } from 'eventsource-parser';
+import { push } from './push.js';
+if (!OPENAI_API_KEY) throw new Error('Missing OpenAI API Key');
 
-export const generateDescription = async (req, res) => {
+export const generateDescription = async (req, response) => {
   const { description, userId } = req.body;
 
   if (!description) {
-    return res.status(400).json({ message: 'No description in the request' });
+    return response
+      .status(400)
+      .json({ message: 'No description in the request' });
   }
 
   const messages = [
@@ -19,24 +24,57 @@ export const generateDescription = async (req, res) => {
     },
   ];
 
+  const payload = {
+    messages,
+    model: 'gpt-3.5-turbo',
+    max_tokens: 500,
+    temperature: 0.2,
+    top_p: 1,
+    frequency_penalty: 1,
+    presence_penalty: 1,
+    user: userId,
+    stream: true,
+  };
+
+  response.writeHead(200, {
+    'Access-Control-Allow-Origin': '*',
+    Connection: 'keep-alive',
+    'Content-Encoding': 'none',
+    'Cache-Control': 'no-cache, no-transform',
+    'Content-Type': 'text/event-stream;charset=utf-8',
+  });
+
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
   try {
-    const completion = await openai.createChatCompletion({
-      messages,
-      model: 'gpt-3.5-turbo',
-      max_tokens: 500,
-      temperature: 0.2,
-      top_p: 1,
-      frequency_penalty: 1,
-      presence_penalty: 1,
-      user: userId,
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${OPENAI_API_KEY || ''}`,
+      },
+      body: JSON.stringify(payload),
     });
 
-    res.status(200).json({
-      answer: completion.data.choices[0].message.content,
-      tokenks: completion.data.usage.prompt_tokens,
+    let counter = 0;
+
+    new ReadableStream({
+      async start(controller) {
+        const parser = createParser((event) =>
+          push({
+            controller,
+            event,
+            response,
+            encoder,
+            counter,
+          }),
+        );
+        for await (const chunk of res.body) {
+          parser.feed(decoder.decode(chunk));
+        }
+      },
     });
   } catch (error) {
-    console.log('error', error);
-    res.status(500).json({ message: 'Something went wrong' });
+    console.log(error);
   }
 };
